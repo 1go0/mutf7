@@ -4,6 +4,9 @@
 '''
 This awesome piece of code is intented to encode and decode modified UTF-7 
 (the one that is used for IMAP folder names)
+
+encode_mutf7(text) - to encode
+decode_mutf7(text) - to decode
 '''
 
 __author__ = "https://github.com/cheshire-mouse"

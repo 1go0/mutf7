@@ -24,7 +24,7 @@ def __get_ascii(text):
         if ord(c) not in ascii_codes :
             break
         pos += 1
-    return text[:pos]
+    return text[:pos].encode('ascii')
 
 def __remove_ascii(text):
     pos = 0
@@ -70,14 +70,14 @@ def encode_mutf7(text):
     return result
 
 def __decode_modified_utf7(text):
-    if text == u'&-':
-        return u'&'
+    if text == '&-':
+        return '&'
     #remove leading & and trailing -
     text_mb64 = text[1:-1]
     text_b64 = text_mb64.replace(',','/')
     #back to normal base64 with padding
     while len(text_b64) % 4 != 0:
-        text_b64 += u'='
+        text_b64 += '='
     text_u16 = base64.b64decode(text_b64)
     result = text_u16.decode('utf-16be')
     return result

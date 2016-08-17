@@ -15,6 +15,11 @@ __license__ = "WTFPL v. 2"
 import base64
 import re
 
+class InvalidUTF7FormatException(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
 ascii_codes = set(range(0x20,0x7f))
 
 def __get_ascii(text):
@@ -69,6 +74,17 @@ def encode_mutf7(text):
             text = __remove_nonascii(text)
     return result
 
+def __check_utf7_format(text):
+    if ( re.match(r'^.*[^\040-\176].*$',text) ):
+        raise InvalidUTF7FormatException('Invalid character for UTF7 encoding')
+    if ( re.match(r'^.*&[^-]*(&.*$|$)',text) ):
+        raise InvalidUTF7FormatException('BASE64 section is not closed')
+    if ( re.match(r'^.*&[A-Za-z0-9+,]*[^\-A-Za-z0-9+,].*$',text) ):
+        raise InvalidUTF7FormatException('Invalid character for BASE64 encoding')
+    if ( re.match(r'^.*&[^-&]+-&[^-&]+-.*$',text) ):
+        raise InvalidUTF7FormatException('Null shifts are not permitted')
+    return
+
 def __decode_modified_utf7(text):
     if text == '&-':
         return '&'
@@ -83,6 +99,7 @@ def __decode_modified_utf7(text):
     return result
 
 def decode_mutf7(text):
+    __check_utf7_format(text)
     rxp = re.compile('&[^&-]*-')
     match = rxp.search(text)
     while ( match ):
